@@ -13,10 +13,11 @@ import (
 )
 
 var (
-	defaultChainPrefix     = commitmentypes.NewMerklePrefix([]byte("ibc"))
-	defaultIBCVersion      = "1.0.0"
-	defaultIBCVersions     = []string{defaultIBCVersion}
-	defaultTransferVersion = "ics20-1"
+	defaultChainPrefix = commitmentypes.NewMerklePrefix([]byte("ibc"))
+	defaultIBCVersion  = "1.0.0"
+	defaultIBCVersions = []string{defaultIBCVersion}
+	// defaultTransferVersion = "ics20-1"
+	defaultTransferVersion = "cross-1"
 	defaultUnbondingTime   = time.Hour * 504 // 3 weeks in hours
 	defaultPacketTimeout   = 1000
 	defaultPacketQuery     = "send_packet.packet_src_channel=%s&send_packet.packet_sequence=%d"
