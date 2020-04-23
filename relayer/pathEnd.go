@@ -46,6 +46,7 @@ func (src *PathEnd) CreateClient(dstHeader *tmclient.Header, trustingPeriod time
 		*dstHeader,
 		trustingPeriod,
 		defaultUnbondingTime,
+		defaultMaxClockDrift,
 		signer,
 	)
 }
@@ -243,6 +244,7 @@ func (src *PathEnd) NewPacket(dst *PathEnd, sequence uint64, packetData []byte, 
 		dst.PortID,
 		dst.ChannelID,
 		timeoutHeight,
+		0,
 	)
 }
 

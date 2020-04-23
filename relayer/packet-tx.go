@@ -18,6 +18,7 @@ var (
 	defaultIBCVersions     = []string{defaultIBCVersion}
 	defaultTransferVersion = "ics20-1"
 	defaultUnbondingTime   = time.Hour * 504 // 3 weeks in hours
+	defaultMaxClockDrift   = time.Second * 10
 	defaultPacketTimeout   = 1000
 	defaultPacketQuery     = "send_packet.packet_src_channel=%s&send_packet.packet_sequence=%d"
 	// defaultPacketAckQuery  = "recv_packet.packet_src_channel=%s&recv_packet.packet_sequence=%d"

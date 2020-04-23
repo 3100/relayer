@@ -21,7 +21,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/go-bip39"
 	"github.com/tendermint/tendermint/libs/log"
+
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
+	httpclient "github.com/tendermint/tendermint/rpc/client/http"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	libclient "github.com/tendermint/tendermint/rpc/lib/client"
 )
@@ -185,7 +187,7 @@ func (src *Chain) GetTrustingPeriod() time.Duration {
 	return tp
 }
 
-func newRPCClient(addr string, timeout time.Duration) (*rpcclient.HTTP, error) {
+func newRPCClient(addr string, timeout time.Duration) (*httpclient.HTTP, error) {
 	httpClient, err := libclient.DefaultHTTPClient(addr)
 	if err != nil {
 		return nil, err
@@ -193,7 +195,7 @@ func newRPCClient(addr string, timeout time.Duration) (*rpcclient.HTTP, error) {
 
 	// TODO: Replace with the global timeout value?
 	httpClient.Timeout = timeout
-	rpcClient, err := rpcclient.NewHTTPWithClient(addr, "/websocket", httpClient)
+	rpcClient, err := httpclient.NewWithClient(addr, "/websocket", httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -337,7 +339,7 @@ func (src *Chain) Update(key, value string) (out *Chain, err error) {
 	case "chain-id":
 		out.ChainID = value
 	case "rpc-addr":
-		if _, err = rpcclient.NewHTTP(value, "/websocket"); err != nil {
+		if _, err = httpclient.New(value, "/websocket"); err != nil {
 			return
 		}
 		out.RPCAddr = value
