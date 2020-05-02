@@ -36,22 +36,16 @@ func RelayPacketsOrderedChan(src, dst *Chain, sh *SyncHeaders, sp *RelaySequence
 	msgs := &RelayMsgs{Src: []sdk.Msg{}, Dst: []sdk.Msg{}}
 	if len(sp.Src) > 0 {
 		msgs.Dst = append(msgs.Dst, dst.PathEnd.UpdateClient(sh.GetHeader(src.ChainID), dst.MustGetAddress()))
-	}
-	if len(sp.Dst) > 0 {
-		msgs.Src = append(msgs.Src, src.PathEnd.UpdateClient(sh.GetHeader(dst.ChainID), src.MustGetAddress()))
-	}
-
-	// add messages for src -> dst
-	for _, seq := range sp.Src {
+		seq := sp.Src[len(sp.Src)-1]
 		msg, err := packetMsgFromTxQuery(src, dst, sh, seq)
 		if err != nil {
 			return err
 		}
 		msgs.Dst = append(msgs.Dst, msg)
 	}
-
-	// add messages for dst -> src
-	for _, seq := range sp.Dst {
+	if len(sp.Dst) > 0 {
+		msgs.Src = append(msgs.Src, src.PathEnd.UpdateClient(sh.GetHeader(dst.ChainID), src.MustGetAddress()))
+		seq := sp.Dst[len(sp.Dst)-1]
 		msg, err := packetMsgFromTxQuery(dst, src, sh, seq)
 		if err != nil {
 			return err
