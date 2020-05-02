@@ -23,7 +23,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
-	httpclient "github.com/tendermint/tendermint/rpc/client/http"
+	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	libclient "github.com/tendermint/tendermint/rpc/lib/client"
 )
@@ -149,6 +149,7 @@ func (src *Chain) Init(homePath string, cdc *codecstd.Codec, amino *aminocodec.C
 	src.Client = client
 	src.Cdc = newContextualStdCodec(cdc, src.UseSDKContext)
 	src.Amino = newContextualAminoCodec(amino, src.UseSDKContext)
+	RegisterCodec(amino)
 	src.HomePath = homePath
 	src.logger = defaultChainLogger()
 	src.timeout = timeout
@@ -187,7 +188,7 @@ func (src *Chain) GetTrustingPeriod() time.Duration {
 	return tp
 }
 
-func newRPCClient(addr string, timeout time.Duration) (*httpclient.HTTP, error) {
+func newRPCClient(addr string, timeout time.Duration) (*rpchttp.HTTP, error) {
 	httpClient, err := libclient.DefaultHTTPClient(addr)
 	if err != nil {
 		return nil, err
@@ -195,7 +196,7 @@ func newRPCClient(addr string, timeout time.Duration) (*httpclient.HTTP, error) 
 
 	// TODO: Replace with the global timeout value?
 	httpClient.Timeout = timeout
-	rpcClient, err := httpclient.NewWithClient(addr, "/websocket", httpClient)
+	rpcClient, err := rpchttp.NewWithClient(addr, "/websocket", httpClient)
 	if err != nil {
 		return nil, err
 	}
@@ -339,7 +340,7 @@ func (src *Chain) Update(key, value string) (out *Chain, err error) {
 	case "chain-id":
 		out.ChainID = value
 	case "rpc-addr":
-		if _, err = httpclient.New(value, "/websocket"); err != nil {
+		if _, err = rpchttp.New(value, "/websocket"); err != nil {
 			return
 		}
 		out.RPCAddr = value

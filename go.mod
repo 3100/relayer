@@ -6,11 +6,10 @@ require (
 	github.com/avast/retry-go v2.6.0+incompatible
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
 	github.com/containerd/continuity v0.0.0-20200228182428-0f16d7a0959c // indirect
-	github.com/cosmos/cosmos-sdk v0.34.4-0.20200422222342-f6e9ee762358
+	github.com/cosmos/cosmos-sdk v0.34.4-0.20200423152229-f1fdde5d1b18
 	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
 	github.com/gorilla/mux v1.7.4
 	github.com/ory/dockertest/v3 v3.5.5
-	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/sirkon/goproxy v1.4.8
 	github.com/sirupsen/logrus v1.5.0 // indirect
 	github.com/spf13/cobra v1.0.0
@@ -19,7 +18,6 @@ require (
 	github.com/tendermint/go-amino v0.15.1
 	github.com/tendermint/tendermint v0.33.4
 	github.com/tendermint/tm-db v0.5.1
-	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
 	gopkg.in/yaml.v2 v2.2.8
 )
 
