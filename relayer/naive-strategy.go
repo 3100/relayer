@@ -3,6 +3,7 @@ package relayer
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -163,9 +164,16 @@ func sendTxFromEventPackets(src, dst *Chain, rlyPackets []relayPacket, sh *SyncH
 		txs.Src = append(txs.Src, rp.Msg(src, dst))
 	}
 
-	// send the transaction, maybe retry here if not successful
-	if txs.Send(src, dst); !txs.success {
-		src.Error(fmt.Errorf("failed to send packets, maybe we should add a retry here"))
+	// TODO fix this retry strategy
+	for i := 0; i < 10; i++ {
+		// send the transaction, maybe retry here if not successful
+		if txs.Send(src, dst); !txs.success {
+			src.Error(fmt.Errorf("failed to send packets, maybe we should add a retry here"))
+			time.Sleep(time.Second)
+			continue
+		} else {
+			return
+		}
 	}
 }
 
@@ -273,53 +281,56 @@ func relayPacketFromQueryResponse(src, dst *PathEnd, res sdk.TxResponse) (rlyPac
 	for _, l := range res.Logs {
 		for _, e := range l.Events {
 			if e.Type == "send_packet" {
-				// NOTE: Src and Dst are switched here
-				rp := &relayMsgRecvPacket{pass: false}
-				for _, p := range e.Attributes {
-					if p.Key == "packet_src_channel" {
-						if p.Value != src.ChannelID {
-							rp.pass = true
-							continue
+				num := len(e.Attributes) / 8
+				for i := 0; i < num; i++ {
+					// NOTE: Src and Dst are switched here
+					rp := &relayMsgRecvPacket{pass: false}
+					for _, p := range e.Attributes[i*8 : (i+1)*8] {
+						if p.Key == "packet_src_channel" {
+							if p.Value != src.ChannelID {
+								rp.pass = true
+								continue
+							}
+						}
+						if p.Key == "packet_dst_channel" {
+							if p.Value != dst.ChannelID {
+								rp.pass = true
+								continue
+							}
+						}
+						if p.Key == "packet_src_port" {
+							if p.Value != src.PortID {
+								rp.pass = true
+								continue
+							}
+						}
+						if p.Key == "packet_dst_port" {
+							if p.Value != dst.PortID {
+								rp.pass = true
+								continue
+							}
+						}
+						if p.Key == "packet_data" {
+							rp.packetData = []byte(p.Value)
+						}
+						if p.Key == "packet_timeout_height" {
+							timeout, _ := strconv.ParseUint(p.Value, 10, 64)
+							rp.timeout = timeout
+						}
+						if p.Key == "packet_timeout_timestamp" {
+							timeout, _ := strconv.ParseUint(p.Value, 10, 64)
+							rp.timeoutStamp = timeout
+						}
+						if p.Key == "packet_sequence" {
+							seq, _ := strconv.ParseUint(p.Value, 10, 64)
+							rp.seq = seq
 						}
 					}
-					if p.Key == "packet_dst_channel" {
-						if p.Value != dst.ChannelID {
-							rp.pass = true
-							continue
-						}
-					}
-					if p.Key == "packet_src_port" {
-						if p.Value != src.PortID {
-							rp.pass = true
-							continue
-						}
-					}
-					if p.Key == "packet_dst_port" {
-						if p.Value != dst.PortID {
-							rp.pass = true
-							continue
-						}
-					}
-					if p.Key == "packet_data" {
-						rp.packetData = []byte(p.Value)
-					}
-					if p.Key == "packet_timeout_height" {
-						timeout, _ := strconv.ParseUint(p.Value, 10, 64)
-						rp.timeout = timeout
-					}
-					if p.Key == "packet_timeout_timestamp" {
-						timeout, _ := strconv.ParseUint(p.Value, 10, 64)
-						rp.timeoutStamp = timeout
-					}
-					if p.Key == "packet_sequence" {
-						seq, _ := strconv.ParseUint(p.Value, 10, 64)
-						rp.seq = seq
-					}
-				}
 
-				// if we have decided not to relay this packet, don't add it
-				if !rp.pass {
-					rlyPackets = append(rlyPackets, rp)
+					// if we have decided not to relay this packet, don't add it
+					if !rp.pass {
+						rlyPackets = append(rlyPackets, rp)
+					}
 				}
 			}
 		}

@@ -78,6 +78,25 @@ func RelayPacketsOrderedChan(src, dst *Chain, sh *SyncHeaders, sp *RelaySequence
 	return nil
 }
 
+func RelayUnacknowledgedPackets(src, dst *Chain, sh *SyncHeaders) error {
+	packets, err := src.QueryUnacknowledgedPackets()
+	if err != nil {
+		return err
+	}
+	for _, p := range packets {
+		if ps, err := dst.queryRecvPackets(p.SourcePort, p.SourceChannel, p.Sequence); err != nil {
+			return err
+		} else if l := len(ps); l == 0 {
+			continue
+		} else if l > 1 {
+			return fmt.Errorf("duplicated packets: %v", l)
+		} else {
+			sendTxFromEventPackets(src, dst, ps, sh)
+		}
+	}
+	return nil
+}
+
 // SendTransferBothSides sends a ICS20 packet from src to dst
 func (src *Chain) SendTransferBothSides(dst *Chain, amount sdk.Coin, dstAddr sdk.AccAddress, source bool) error {
 

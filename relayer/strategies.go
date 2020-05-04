@@ -59,6 +59,10 @@ func RunStrategy(src, dst *Chain, strategy Strategy, ordered bool) (func(), erro
 	// Next start the goroutine that listens to each chain for block and tx events
 	go relayerListenLoop(src, dst, doneChan, sh, strategy)
 
+	if err := RelayUnacknowledgedPackets(src, dst, sh); err != nil {
+		return nil, err
+	}
+
 	// Fetch any unrelayed sequences depending on the channel order
 	var sp *RelaySequences
 	if ordered {
