@@ -16,7 +16,7 @@ type PacketStatus = types.UnacknowledgedPacket
 
 func (c *Chain) QueryUnacknowledgedPackets() ([]PacketStatus, error) {
 	req := types.QueryUnacknowledgedPacketsRequest{}
-	bz, err := c.Amino.MarshalBinaryLengthPrefixed(req)
+	bz, err := c.Amino.MarshalJSON(req)
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +26,7 @@ func (c *Chain) QueryUnacknowledgedPackets() ([]PacketStatus, error) {
 		return nil, err
 	}
 	var response types.QueryUnacknowledgedPacketsResponse
-	c.Amino.MustUnmarshalBinaryLengthPrefixed(res, &response)
+	c.Amino.MustUnmarshalJSON(res, &response)
 	return response.Packets, nil
 }
 
