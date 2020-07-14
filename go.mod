@@ -8,7 +8,7 @@ require (
 	github.com/containerd/continuity v0.0.0-20200228182428-0f16d7a0959c // indirect
 	github.com/cosmos/cosmos-sdk v0.34.4-0.20200423152229-f1fdde5d1b18
 	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
-	github.com/datachainlab/cross v0.0.0-20200507061335-6fded9aa2c2e
+	github.com/datachainlab/cross v0.0.6-0.20200714122001-f3454ba0e831
 	github.com/gorilla/mux v1.7.4
 	github.com/ory/dockertest/v3 v3.5.5
 	github.com/sirkon/goproxy v1.4.8
