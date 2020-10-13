@@ -23,7 +23,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
-	codecstd "github.com/cosmos/cosmos-sdk/codec/std"
 	"github.com/datachainlab/cross/example/simapp"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -86,8 +85,7 @@ func init() {
 	)
 
 	// This is a bit of a cheat :shushing_face:
-	cdc = codecstd.MakeCodec(simapp.ModuleBasics)
-	appCodec = codecstd.NewAppCodec(cdc)
+	appCodec, cdc = simapp.MakeCodecs()
 }
 
 // rootCmd represents the base command when called without any subcommands

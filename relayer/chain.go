@@ -11,10 +11,10 @@ import (
 	"sync"
 	"time"
 
-	sdkCtx "github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	ckeys "github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/codec"
 	aminocodec "github.com/cosmos/cosmos-sdk/codec"
-	codecstd "github.com/cosmos/cosmos-sdk/codec/std"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	keys "github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,7 +25,7 @@ import (
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
-	libclient "github.com/tendermint/tendermint/rpc/lib/client"
+	libclient "github.com/tendermint/tendermint/rpc/jsonrpc/client"
 )
 
 // Chain represents the necessary data for connecting to and indentifying a chain and its counterparites
@@ -124,7 +124,7 @@ func (src *Chain) listenLoop(doneChan chan struct{}, tx, block, data bool) {
 
 // Init initializes the pieces of a chain that aren't set when it parses a config
 // NOTE: All validation of the chain should happen here.
-func (src *Chain) Init(homePath string, cdc *codecstd.Codec, amino *aminocodec.Codec, timeout time.Duration, debug bool) error {
+func (src *Chain) Init(homePath string, cdc *codec.Marshaler, amino *aminocodec.Codec, timeout time.Duration, debug bool) error {
 	keybase, err := keys.New(src.ChainID, "test", keysDir(homePath, src.ChainID), nil)
 	if err != nil {
 		return err
@@ -236,7 +236,7 @@ func (src *Chain) BuildAndSignTx(datagram []sdk.Msg) ([]byte, error) {
 
 // BroadcastTxCommit takes the marshaled transaction bytes and broadcasts them
 func (src *Chain) BroadcastTxCommit(txBytes []byte) (sdk.TxResponse, error) {
-	res, err := sdkCtx.CLIContext{Client: src.Client}.BroadcastTxCommit(txBytes)
+	res, err := client.Context{Client: src.Client}.BroadcastTxCommit(txBytes)
 
 	if !src.debug {
 		res.RawLog = ""

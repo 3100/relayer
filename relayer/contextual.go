@@ -2,11 +2,10 @@ package relayer
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	stdcodec "github.com/cosmos/cosmos-sdk/codec/std"
 )
 
 type contextualStdCodec struct {
-	*stdcodec.Codec
+	*codec.Marshaler
 	useContext func() func()
 }
 
@@ -16,7 +15,7 @@ type contextualAminoCodec struct {
 }
 
 // newContextualCodec creates a codec that sets and resets context
-func newContextualStdCodec(cdc *stdcodec.Codec, useContext func() func()) *contextualStdCodec {
+func newContextualStdCodec(cdc *codec.Marshaler, useContext func() func()) *contextualStdCodec {
 	return &contextualStdCodec{
 		Codec:      cdc,
 		useContext: useContext,
